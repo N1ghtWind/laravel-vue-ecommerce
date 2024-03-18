@@ -15,7 +15,17 @@ class ProductController extends Controller
      */
     public function index()
     {
-       return ProductCollection::collection(Product::query()->paginate(10));
+        $perPage = request('per_page', 10);
+        $search = request('search', '');
+        $sortField = request('sort_field', 'created_at');
+        $sortDirection = request('sort_direction', 'desc');
+
+        $query = Product::query()
+            ->where('title', 'like', "%{$search}%")
+            ->orderBy($sortField, $sortDirection)
+            ->paginate($perPage);
+
+        return ProductCollection::collection($query);
     }
 
     /**
@@ -24,7 +34,7 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
 
-       return new ProductResource(Product::create($request->validated()));
+        return new ProductResource(Product::create($request->validated()));
     }
 
     /**
@@ -34,7 +44,6 @@ class ProductController extends Controller
     {
         return new ProductResource($product);
     }
-
 
 
     /**
